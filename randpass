@@ -27,12 +27,12 @@ fi
 #
 #  The character set to use.
 #
-cset="[:alnum:]"
+cset="[:alnum:][:punct:]"
 
 #
 #  Default length
 #
-len=8
+len=15
 
 while getopts "h?fn:" opt; do
   case $opt in
