@@ -98,6 +98,24 @@ Example:
 
 
 
+expand-ipv6
+-----------
+
+Expand an abbreviated/compressed IPv6 address to the full-form.
+
+Example:
+
+     ./expand-ipv6 fe80::1 2001:41c8:10b:103::111
+     fe80:0000:0000:0000:0000:0000:0001
+     2001:41c8:010b:0103:0000:0000:0111
+
+Alternatives:
+
+* `sipcalc`
+* ...
+
+
+
 graphite_send
 -------------
 
@@ -175,7 +193,7 @@ Example:
      Host steve.org.uk - 80.68.85.46 alive
      Host steve.org.uk - 2001:41c8:125:46:0:0:0:10 alive
 
-As a convienence you may also specify URIs as arguments, for example:
+As a convenience you may also specify URIs as arguments, for example:
 
      $ multi-ping http://steve.org.uk/foo/bar
      Host steve.org.uk - 80.68.85.46 alive
@@ -306,6 +324,32 @@ Example:
      publickey
 
 
+
+ssh-test
+--------
+
+Test whether `ssh` connections to a list of hosts will succeed, by testing
+each in order.
+
+Example:
+
+     $ ./ssh-test host.list.txt
+     ssh.steve.org.uk    ... OK
+     www.steve.org.uk    ... OK
+     foo.example.com:222 ... OK
+
+     $ cat host.list.txt
+     ssh.steve.org.uk
+     www.steve.org.uk
+     foo.example.com:222
+
+The format of the input-file is:
+
+    [user@]hostname1[:port]
+    [user@]hostname2[:port]
+    ..
+
+
 splay
 -----
 
@@ -329,13 +373,25 @@ Existing alternatives:
 ssl-expiry-date
 ----------------
 
-Report the date, and number of days, until the given SSL certificate expires.
+Report the date, and number of days, until the given SSL certificate
+expires.  Multiple domain-names may be accepted and each is tested
+in turn.
+
+The default output is "noisy", but you may add "-d" to simplify this
+to the domain-name and the number of days remaining on the certificate.
+
 
 Example:
 
-        ./ssl-expiry-date bbc.co.uk
-        Certificate presented at : bbc.co.uk
-        Expires: Jun 18 13:50:58 2013 GMT  [63 days in the future]
+      ./ssl-expiry-date  bbc.co.uk
+      bbc.co.uk
+          Expires: Sep 18 13:50:57 2016 GMT
+          Days: 266
+
+      ./ssl-expiry-date -d bbc.co.uk steve.org.uk
+      bbc.co.uk: 266
+      steve.org.uk: 82
+
 
 
 
@@ -378,7 +434,7 @@ Trivial (ba)sh alternatives:
 when-up
 -------
 
-Waits until a given host is online (determined by ping until executing a given command
+Waits until a given host is online, determined by ping, until executing a given command.
 
 Example:
 
@@ -390,6 +446,40 @@ Example:
 Alternatives:
 
 * `until-success ping -c 1 1.2.3.4; ssh user@1.2.3.4`
+
+
+
+until-error
+-------------
+
+Repeat the specific command until it fails - run at least once
+always.
+
+Example:
+
+         ./until-error ssh example.com -l root -i ~/.ssh/example.com.key
+
+Trivial (ba)sh alternatives:
+
+* while true ; do $cmd; done
+* watch -n 2 $cmd
+
+
+
+when-down
+-------
+
+Waits until a given host is down
+
+Example:
+
+     $ ./when-down 1.2.3.4 echo "down"
+     Waiting for 1.2.3.4 to get down...
+     down
+
+Alternatives:
+
+* `until-error ping -c 1 -W 1 1.2.3.4; echo "down"`
 
 
 
